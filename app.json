@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Kinetic Launch",
+    "slug": "webfitness-launch",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#f4f0e8"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
