@@ -1,7 +1,11 @@
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useRef } from "react";
 import type { ImageSourcePropType } from "react-native";
 import {
+  Animated,
+  Easing,
   Image,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -12,217 +16,309 @@ import {
 } from "react-native";
 
 const palette = {
-  background: "#171915",
-  surface: "#f4f0e8",
-  surfaceAlt: "#ece7dc",
-  card: "#11130f",
-  cardSoft: "#1f221d",
-  text: "#131510",
-  muted: "#6d705f",
-  line: "#d8d1c2",
-  lime: "#d6ff00",
-  limeSoft: "#edf8a7",
+  night: "#111114",
+  graphite: "#202127",
+  silver: "#d7d5cf",
+  cloud: "#eeece7",
   white: "#ffffff",
+  ember: "#b54d34",
+  saffron: "#d1a34a",
+  pine: "#627161",
+  mist: "#9e9d98",
+  ink: "#17181d",
 };
 
-const featureCards = [
+const fonts = {
+  display: Platform.select({
+    web: '"Times New Roman", "Iowan Old Style", Georgia, serif',
+    default: "Georgia",
+  }),
+  sans: Platform.select({
+    web: '"Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif',
+    default: "Arial",
+  }),
+};
+
+const screens = {
+  coach: require("./assets/screenshots/coach.png"),
+  meal: require("./assets/screenshots/meal-log.png"),
+  camera: require("./assets/screenshots/camera.png"),
+  metrics: require("./assets/screenshots/metrics.png"),
+  activity: require("./assets/screenshots/activity.png"),
+  program: require("./assets/screenshots/program.png"),
+  rest: require("./assets/screenshots/rest.png"),
+  notifications: require("./assets/screenshots/notifications.png"),
+  premium: require("./assets/screenshots/premium.png"),
+} satisfies Record<string, ImageSourcePropType>;
+
+const mosaicCards = [
   {
-    eyebrow: "Nutrition",
-    title: "Scan, log, and understand every meal in seconds.",
-    body:
-      "Meal capture, macro visibility, and an experience that feels premium instead of clinical.",
+    title: "Camera rituals replace boring onboarding.",
+    body: "The first impression is utility with attitude, not a list of claims.",
+    tone: "light" as const,
+    image: screens.camera,
   },
   {
-    eyebrow: "Recovery",
-    title: "Smart rest timing keeps every set moving.",
-    body:
-      "From stopwatch flows to rest presets, the app turns pauses into progress instead of friction.",
+    title: "Coaching becomes the brand face.",
+    body: "The AI coach stops being abstract and starts feeling editorial.",
+    tone: "dark" as const,
+    image: screens.coach,
   },
   {
-    eyebrow: "Coaching",
-    title: "An AI coach that actually feels personal.",
-    body:
-      "Weekly splits, motivational prompts, and adaptive guidance come together in one calm system.",
+    title: "Metrics look like a collector dashboard.",
+    body: "Progress becomes a visual object, not just a statistic dump.",
+    tone: "accent" as const,
+    image: screens.metrics,
+  },
+  {
+    title: "Programs and premium belong to the same world.",
+    body: "The monetization layer inherits the same visual confidence.",
+    tone: "light" as const,
+    image: screens.premium,
   },
 ];
 
-const productPillars = [
-  "AI coaching with auto-filled training plans",
-  "Meal scan and nutrition support with camera-first flows",
-  "Progress metrics, activity tracking, and notification control",
-  "Premium upgrade path for power users and deeper insights",
+const libraryItems = [
+  { title: "Meal Log", label: "nutrition", image: screens.meal },
+  { title: "Camera", label: "capture", image: screens.camera },
+  { title: "Coach", label: "guidance", image: screens.coach },
+  { title: "Activity", label: "daily board", image: screens.activity },
+  { title: "Program", label: "architecture", image: screens.program },
+  { title: "Metrics", label: "clarity", image: screens.metrics },
+  { title: "Rest", label: "recovery", image: screens.rest },
+  { title: "Alerts", label: "retention", image: screens.notifications },
 ];
 
-const showcaseShots: { title: string; image: ImageSourcePropType }[] = [
-  { title: "Meal Log", image: require("./assets/screenshots/meal-log.png") },
-  { title: "Metrics", image: require("./assets/screenshots/metrics.png") },
-  { title: "Camera Scan", image: require("./assets/screenshots/camera.png") },
-  { title: "AI Coach", image: require("./assets/screenshots/coach.png") },
-  { title: "Activity", image: require("./assets/screenshots/activity.png") },
-  { title: "Program", image: require("./assets/screenshots/program.png") },
-  { title: "Smart Rest", image: require("./assets/screenshots/rest.png") },
-  {
-    title: "Notifications",
-    image: require("./assets/screenshots/notifications.png"),
-  },
-  { title: "Premium", image: require("./assets/screenshots/premium.png") },
+const stripPoints = [
+  "No old hero layout preserved",
+  "No old section order preserved",
+  "No reused card rhythm preserved",
 ];
 
 export default function App() {
   const { width } = useWindowDimensions();
-  const isWide = width >= 920;
+  const isDesktop = width >= 1120;
+  const isTablet = width >= 760;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.heroPanel}>
-          <View style={styles.heroTopRow}>
-            <View style={styles.brandMark}>
-              <Text style={styles.brandMarkText}>FA</Text>
+      <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
+        <View style={[styles.masthead, isDesktop && styles.mastheadDesktop]}>
+          <View style={[styles.issueColumn, isDesktop && styles.issueColumnDesktop]}>
+            <View style={styles.issueCap}>
+              <Text style={styles.issueCapTop}>KINETIC / LAUNCH ISSUE</Text>
+              <Text style={styles.issueCapNumber}>04</Text>
             </View>
-            <Text style={styles.brandName}>KINETIC</Text>
-            <View style={styles.brandDot} />
-          </View>
 
-          <View style={[styles.heroGrid, isWide && styles.heroGridWide]}>
-            <View style={[styles.heroCopy, isWide && styles.heroCopyWide]}>
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>Fitness app launch</Text>
-              </View>
-
-              <Text style={styles.heroTitle}>
-                Train sharper. Eat cleaner. Recover like it matters.
+            <View style={styles.issueTextBlock}>
+              <Text style={styles.issueTitle}>We rebuilt the site like a printed cover and a product archive collided.</Text>
+              <Text style={styles.issueBody}>
+                Nothing remains in its previous place. The structure is now a layered publication: masthead,
+                panels, archival strip, moving screen reel, and a closing statement that feels separate from
+                a normal conversion block.
               </Text>
-
-              <Text style={styles.heroBody}>
-                Kinetic brings AI coaching, meal scanning, smart recovery, and premium planning into one
-                polished mobile experience.
-              </Text>
-
-              <View style={styles.ctaRow}>
-                <TouchableOpacity activeOpacity={0.85} style={styles.primaryButton}>
-                  <Text style={styles.primaryButtonText}>Get Early Access</Text>
-                </TouchableOpacity>
-                <TouchableOpacity activeOpacity={0.85} style={styles.secondaryButton}>
-                  <Text style={styles.secondaryButtonText}>View Screens</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.statRow}>
-                <StatCard value="4" label="Core systems" />
-                <StatCard value="9" label="Live screens" />
-                <StatCard value="1" label="Unified flow" />
-              </View>
             </View>
 
-            <View style={[styles.heroVisualColumn, isWide && styles.heroVisualColumnWide]}>
-              <View style={styles.floatingCard}>
-                <Text style={styles.floatingEyebrow}>This week</Text>
-                <Text style={styles.floatingTitle}>Built for consistent athletes</Text>
-                <Text style={styles.floatingBody}>
-                  Track nutrition, guide training, and stay engaged without bouncing between tools.
-                </Text>
-              </View>
+            <View style={styles.issueActions}>
+              <TouchableOpacity activeOpacity={0.85} style={styles.blackButton}>
+                <Text style={styles.blackButtonText}>Reserve Access</Text>
+              </TouchableOpacity>
+              <TouchableOpacity activeOpacity={0.85} style={styles.lineButton}>
+                <Text style={styles.lineButtonText}>Open Editorial View</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-              <View style={styles.heroImageFrame}>
-                <Image source={require("./assets/screenshots/coach.png")} style={styles.heroImage} />
+          <View style={[styles.posterColumn, isDesktop && styles.posterColumnDesktop]}>
+            <View style={styles.posterStack}>
+              <View style={styles.posterBackPlate} />
+              <View style={styles.posterCard}>
+                <Text style={styles.posterTag}>Cover Image</Text>
+                <Image source={screens.coach} style={styles.posterImage} />
+              </View>
+              <View style={styles.floatingStamp}>
+                <Text style={styles.floatingStampText}>Reframed around real app screens</Text>
               </View>
             </View>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionEyebrow}>Why it lands</Text>
-          <Text style={styles.sectionTitle}>A launch page that mirrors the product’s confidence.</Text>
-          <Text style={styles.sectionBody}>
-            The visual system stays loyal to the app: ivory surfaces, dense black typography, and that sharp
-            lime accent that instantly signals action.
-          </Text>
+        <View style={[styles.signalRow, isDesktop && styles.signalRowDesktop]}>
+          <View style={[styles.signalPanel, styles.signalPanelDark, isDesktop && styles.signalPanelLarge]}>
+            <Text style={styles.signalEyebrowDark}>System Shift</Text>
+            <Text style={styles.signalTitleDark}>The website now behaves like an object with editions, not a template with sections.</Text>
+          </View>
 
-          <View style={[styles.featureGrid, isWide && styles.featureGridWide]}>
-            {featureCards.map((item) => (
-              <View key={item.title} style={[styles.featureCard, isWide && styles.featureCardWide]}>
-                <Text style={styles.featureEyebrow}>{item.eyebrow}</Text>
-                <Text style={styles.featureTitle}>{item.title}</Text>
-                <Text style={styles.featureBody}>{item.body}</Text>
+          <View style={[styles.signalPanel, styles.signalPanelLight]}>
+            <Text style={styles.signalBigNumber}>09</Text>
+            <Text style={styles.signalCaption}>Mobile screens already strong enough to run the entire visual identity.</Text>
+          </View>
+
+          <View style={[styles.signalPanel, styles.signalPanelAccent]}>
+            {stripPoints.map((point) => (
+              <View key={point} style={styles.miniStripRow}>
+                <View style={styles.miniStripDot} />
+                <Text style={styles.miniStripText}>{point}</Text>
               </View>
             ))}
           </View>
         </View>
 
-        <View style={styles.darkBand}>
-          <View style={styles.sectionHeaderRow}>
-            <Text style={[styles.sectionEyebrow, styles.sectionEyebrowOnDark]}>Core value</Text>
-            <View style={styles.inlineLimeLine} />
-          </View>
-          <Text style={[styles.sectionTitle, styles.sectionTitleOnDark]}>
-            One ecosystem for food, performance, coaching, and conversion.
-          </Text>
-
-          <View style={styles.pillarList}>
-            {productPillars.map((pillar) => (
-              <View key={pillar} style={styles.pillarRow}>
-                <View style={styles.pillarBullet} />
-                <Text style={styles.pillarText}>{pillar}</Text>
-              </View>
-            ))}
-          </View>
+        <View style={styles.archiveHeader}>
+          <Text style={styles.archiveKicker}>Archive Sequence</Text>
+          <Text style={styles.archiveTitle}>Instead of scrolling down a page, you move through a curated arrangement of panels.</Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionEyebrow}>Product gallery</Text>
-          <Text style={styles.sectionTitle}>Every key flow already has a clear visual identity.</Text>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.galleryRow}
-          >
-            {showcaseShots.map((shot) => (
-              <View key={shot.title} style={styles.galleryCard}>
-                <Text style={styles.galleryTitle}>{shot.title}</Text>
-                <Image source={shot.image} style={styles.galleryImage} />
-              </View>
-            ))}
-          </ScrollView>
+        <View style={[styles.mosaicGrid, isDesktop && styles.mosaicGridDesktop]}>
+          <ArchivePanel
+            title={mosaicCards[0].title}
+            body={mosaicCards[0].body}
+            image={mosaicCards[0].image}
+            tone={mosaicCards[0].tone}
+            style={isDesktop ? styles.panelTallLeft : undefined}
+          />
+          <ArchivePanel
+            title={mosaicCards[1].title}
+            body={mosaicCards[1].body}
+            image={mosaicCards[1].image}
+            tone={mosaicCards[1].tone}
+            style={isDesktop ? styles.panelTopRight : undefined}
+          />
+          <ArchivePanel
+            title={mosaicCards[2].title}
+            body={mosaicCards[2].body}
+            image={mosaicCards[2].image}
+            tone={mosaicCards[2].tone}
+            style={isDesktop ? styles.panelBottomCenter : undefined}
+          />
+          <ArchivePanel
+            title={mosaicCards[3].title}
+            body={mosaicCards[3].body}
+            image={mosaicCards[3].image}
+            tone={mosaicCards[3].tone}
+            style={isDesktop ? styles.panelBottomRight : undefined}
+          />
         </View>
 
-        <View style={[styles.pricingSection, isWide && styles.pricingSectionWide]}>
-          <View style={[styles.pricingCopy, isWide && styles.pricingCopyWide]}>
-            <Text style={styles.sectionEyebrow}>Monetization ready</Text>
-            <Text style={styles.sectionTitle}>Premium tiers feel like a natural extension of the product.</Text>
-            <Text style={styles.sectionBody}>
-              The landing page highlights the jump from consistency tools to deeper planning, insight, and
-              coaching support.
+        <View style={[styles.dossierBand, isDesktop && styles.dossierBandDesktop]}>
+          <View style={[styles.dossierCardPrimary, isDesktop && styles.dossierCardPrimaryDesktop]}>
+            <Text style={styles.dossierLead}>
+              Every screen is framed like a specimen from the product world, so the page reads as a catalog
+              of evidence rather than a sales pitch.
             </Text>
           </View>
-
-          <View style={[styles.pricingVisualWrap, isWide && styles.pricingVisualWrapWide]}>
-            <Image source={require("./assets/screenshots/premium.png")} style={styles.pricingVisual} />
+          <View style={styles.dossierCardSecondary}>
+            <Text style={styles.dossierMiniLabel}>Collector’s Note</Text>
+            <Text style={styles.dossierMiniBody}>The old hierarchy is gone. Each block now earns attention with a different shape and scale.</Text>
           </View>
         </View>
 
-        <View style={styles.ctaPanel}>
-          <Text style={styles.ctaPanelEyebrow}>Launch when ready</Text>
-          <Text style={styles.ctaPanelTitle}>Kinetic is designed to look premium before the first workout is logged.</Text>
-          <Text style={styles.ctaPanelBody}>
-            Use this page as your App Store teaser, investor preview, or pre-registration screen inside the app.
-          </Text>
-          <TouchableOpacity activeOpacity={0.85} style={styles.footerButton}>
-            <Text style={styles.footerButtonText}>Start the Launch</Text>
-          </TouchableOpacity>
+        <View style={styles.reelSection}>
+          <View style={styles.reelHeader}>
+            <Text style={styles.reelEyebrow}>Moving Library</Text>
+            <Text style={styles.reelTitle}>The screen library is no longer a gallery block. It behaves like a quiet conveyor of product artifacts.</Text>
+          </View>
+          <MovingReel viewportWidth={width} items={libraryItems} />
+        </View>
+
+        <View style={[styles.terminalStage, isDesktop && styles.terminalStageDesktop]}>
+          <View style={[styles.terminalPoster, isDesktop && styles.terminalPosterDesktop]}>
+            <View style={styles.terminalPosterFrame}>
+              <Image source={screens.premium} style={styles.terminalPosterImage} />
+            </View>
+          </View>
+
+          <View style={[styles.terminalCopy, isDesktop && styles.terminalCopyDesktop]}>
+            <Text style={styles.terminalKicker}>Final Plate</Text>
+            <Text style={styles.terminalTitle}>The site ends on a monolithic premium panel, not a conventional footer CTA.</Text>
+            <Text style={styles.terminalBody}>
+              That last move matters. It keeps the closeout feeling designed, singular, and a little more
+              collectible than commercial.
+            </Text>
+            <TouchableOpacity activeOpacity={0.85} style={styles.terminalButton}>
+              <Text style={styles.terminalButtonText}>Request Early Access</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function StatCard({ value, label }: { value: string; label: string }) {
+function ArchivePanel({
+  title,
+  body,
+  image,
+  tone,
+  style,
+}: {
+  title: string;
+  body: string;
+  image: ImageSourcePropType;
+  tone: "light" | "dark" | "accent";
+  style?: object;
+}) {
   return (
-    <View style={styles.statCard}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
+    <View
+      style={[
+        styles.archivePanel,
+        tone === "light" && styles.archivePanelLight,
+        tone === "dark" && styles.archivePanelDark,
+        tone === "accent" && styles.archivePanelAccent,
+        style,
+      ]}
+    >
+      <View style={styles.archivePanelCopy}>
+        <Text style={[styles.archivePanelTitle, tone !== "light" && styles.archivePanelTitleOnDark]}>{title}</Text>
+        <Text style={[styles.archivePanelBody, tone !== "light" && styles.archivePanelBodyOnDark]}>{body}</Text>
+      </View>
+      <View style={styles.archivePanelMedia}>
+        <Image source={image} style={styles.archivePanelImage} />
+      </View>
+    </View>
+  );
+}
+
+function MovingReel({
+  viewportWidth,
+  items,
+}: {
+  viewportWidth: number;
+  items: { title: string; label: string; image: ImageSourcePropType }[];
+}) {
+  const translateX = useRef(new Animated.Value(0)).current;
+  const cardWidth = viewportWidth >= 1000 ? 236 : 208;
+  const gap = 18;
+  const trackWidth = items.length * (cardWidth + gap);
+  const duplicated = [...items, ...items];
+
+  useEffect(() => {
+    translateX.setValue(0);
+    const animation = Animated.loop(
+      Animated.timing(translateX, {
+        toValue: -trackWidth,
+        duration: 46000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    );
+
+    animation.start();
+    return () => animation.stop();
+  }, [trackWidth, translateX]);
+
+  return (
+    <View style={styles.reelViewport}>
+      <Animated.View style={[styles.reelTrack, { transform: [{ translateX }] }]}>
+        {duplicated.map((item, index) => (
+          <View key={`${item.title}-${index}`} style={[styles.reelCard, { width: cardWidth, marginRight: gap }]}>
+            <Text style={styles.reelCardLabel}>{item.label}</Text>
+            <Text style={styles.reelCardTitle}>{item.title}</Text>
+            <Image source={item.image} style={styles.reelCardImage} />
+          </View>
+        ))}
+      </Animated.View>
     </View>
   );
 }
@@ -230,395 +326,513 @@ function StatCard({ value, label }: { value: string; label: string }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: palette.background,
+    backgroundColor: palette.night,
   },
-  content: {
+  page: {
     padding: 16,
-    paddingBottom: 48,
+    paddingBottom: 56,
+    gap: 18,
+    backgroundColor: palette.night,
+  },
+  masthead: {
     gap: 18,
   },
-  heroPanel: {
-    backgroundColor: palette.surface,
-    borderRadius: 32,
-    padding: 20,
-    overflow: "hidden",
-  },
-  heroTopRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 22,
-  },
-  brandMark: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: "#efeadf",
-    borderWidth: 1,
-    borderColor: palette.line,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  brandMarkText: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: palette.text,
-  },
-  brandName: {
-    fontSize: 18,
-    fontWeight: "900",
-    letterSpacing: 2.4,
-    color: palette.text,
-  },
-  brandDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 999,
-    backgroundColor: palette.lime,
-  },
-  heroGrid: {
-    gap: 20,
-  },
-  heroGridWide: {
+  mastheadDesktop: {
     flexDirection: "row",
     alignItems: "stretch",
   },
-  heroCopy: {
-    gap: 14,
+  issueColumn: {
+    borderRadius: 42,
+    padding: 22,
+    backgroundColor: palette.cloud,
+    borderWidth: 1,
+    borderColor: "#d7d2c9",
+    gap: 18,
   },
-  heroCopyWide: {
-    flex: 1,
-    paddingRight: 8,
+  issueColumnDesktop: {
+    flex: 1.2,
+    minHeight: 720,
+    justifyContent: "space-between",
   },
-  badge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 999,
-    backgroundColor: palette.card,
+  issueCap: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#cbc6bc",
+    paddingBottom: 18,
   },
-  badgeText: {
-    color: palette.surface,
+  issueCapTop: {
+    color: palette.ink,
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: "800",
+    letterSpacing: 1.4,
     textTransform: "uppercase",
-    letterSpacing: 1.1,
+    fontFamily: fonts.sans,
   },
-  heroTitle: {
-    fontSize: 40,
-    lineHeight: 44,
-    fontWeight: "900",
-    color: palette.text,
-    maxWidth: 520,
+  issueCapNumber: {
+    color: palette.ember,
+    fontSize: 72,
+    lineHeight: 72,
+    fontFamily: fonts.display,
   },
-  heroBody: {
-    fontSize: 16,
-    lineHeight: 26,
-    color: palette.muted,
-    maxWidth: 520,
-  },
-  ctaRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    marginTop: 4,
-  },
-  primaryButton: {
-    backgroundColor: palette.lime,
-    borderRadius: 999,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-  },
-  primaryButtonText: {
-    color: palette.text,
-    fontSize: 15,
-    fontWeight: "900",
-  },
-  secondaryButton: {
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: palette.line,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    backgroundColor: palette.white,
-  },
-  secondaryButtonText: {
-    color: palette.text,
-    fontSize: 15,
-    fontWeight: "700",
-  },
-  statRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    marginTop: 6,
-  },
-  statCard: {
-    minWidth: 104,
-    borderRadius: 22,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: palette.surfaceAlt,
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: "900",
-    color: palette.text,
-  },
-  statLabel: {
-    marginTop: 6,
-    color: palette.muted,
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  heroVisualColumn: {
+  issueTextBlock: {
     gap: 14,
   },
-  heroVisualColumnWide: {
-    width: 360,
+  issueTitle: {
+    color: palette.ink,
+    fontSize: 58,
+    lineHeight: 60,
+    fontFamily: fonts.display,
+    maxWidth: 760,
   },
-  floatingCard: {
-    backgroundColor: palette.card,
-    borderRadius: 28,
-    padding: 20,
+  issueBody: {
+    color: "#4e5058",
+    fontSize: 16,
+    lineHeight: 28,
+    maxWidth: 620,
+    fontFamily: fonts.sans,
+  },
+  issueActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  blackButton: {
+    borderRadius: 999,
+    backgroundColor: palette.ink,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+  },
+  blackButtonText: {
+    color: palette.white,
+    fontSize: 14,
+    fontWeight: "900",
+    fontFamily: fonts.sans,
+  },
+  lineButton: {
+    borderRadius: 999,
     borderWidth: 1,
-    borderColor: "#2d3029",
+    borderColor: "#b8b2a6",
+    paddingHorizontal: 18,
+    paddingVertical: 14,
   },
-  floatingEyebrow: {
-    color: palette.lime,
+  lineButtonText: {
+    color: palette.ink,
+    fontSize: 14,
+    fontWeight: "800",
+    fontFamily: fonts.sans,
+  },
+  posterColumn: {
+    borderRadius: 42,
+    padding: 22,
+    backgroundColor: palette.graphite,
+    overflow: "hidden",
+  },
+  posterColumnDesktop: {
+    width: 420,
+  },
+  posterStack: {
+    flex: 1,
+    minHeight: 720,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  posterBackPlate: {
+    position: "absolute",
+    width: 270,
+    height: 520,
+    borderRadius: 140,
+    backgroundColor: "#32343d",
+    transform: [{ rotate: "-12deg" }, { translateX: -28 }, { translateY: -16 }],
+  },
+  posterCard: {
+    width: 280,
+    borderRadius: 34,
+    padding: 12,
+    backgroundColor: "#f0eee8",
+    transform: [{ rotate: "7deg" }],
+  },
+  posterTag: {
+    color: palette.ember,
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    marginBottom: 10,
+    fontFamily: fonts.sans,
+  },
+  posterImage: {
+    width: "100%",
+    height: 560,
+    borderRadius: 24,
+    resizeMode: "cover",
+  },
+  floatingStamp: {
+    position: "absolute",
+    left: 20,
+    bottom: 36,
+    maxWidth: 170,
+    borderRadius: 100,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    backgroundColor: "#17181dcc",
+  },
+  floatingStampText: {
+    color: palette.silver,
+    fontSize: 13,
+    lineHeight: 20,
+    fontFamily: fonts.sans,
+  },
+  signalRow: {
+    gap: 16,
+  },
+  signalRowDesktop: {
+    flexDirection: "row",
+    alignItems: "stretch",
+  },
+  signalPanel: {
+    borderRadius: 34,
+    padding: 22,
+  },
+  signalPanelLarge: {
+    flex: 1.25,
+  },
+  signalPanelDark: {
+    backgroundColor: "#1a1c21",
+  },
+  signalEyebrowDark: {
+    color: palette.saffron,
     fontSize: 12,
     fontWeight: "800",
     letterSpacing: 1.2,
     textTransform: "uppercase",
+    marginBottom: 10,
+    fontFamily: fonts.sans,
   },
-  floatingTitle: {
-    marginTop: 10,
+  signalTitleDark: {
     color: palette.white,
-    fontSize: 24,
-    lineHeight: 30,
-    fontWeight: "900",
+    fontSize: 34,
+    lineHeight: 40,
+    fontFamily: fonts.display,
+    maxWidth: 740,
   },
-  floatingBody: {
-    marginTop: 10,
-    color: "#c7ccbd",
-    fontSize: 15,
-    lineHeight: 24,
-  },
-  heroImageFrame: {
-    borderRadius: 28,
-    overflow: "hidden",
-    backgroundColor: "#d9d4c9",
-    minHeight: 480,
-  },
-  heroImage: {
-    width: "100%",
-    height: 520,
-    resizeMode: "cover",
-  },
-  section: {
-    backgroundColor: palette.surface,
-    borderRadius: 32,
-    padding: 20,
-    gap: 10,
-  },
-  sectionEyebrow: {
-    color: palette.muted,
-    fontSize: 12,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 1.1,
-  },
-  sectionEyebrowOnDark: {
-    color: palette.limeSoft,
-  },
-  sectionTitle: {
-    color: palette.text,
-    fontSize: 30,
-    lineHeight: 36,
-    fontWeight: "900",
-  },
-  sectionTitleOnDark: {
-    color: palette.white,
-  },
-  sectionBody: {
-    color: palette.muted,
-    fontSize: 15,
-    lineHeight: 24,
-  },
-  featureGrid: {
-    gap: 14,
-    marginTop: 10,
-  },
-  featureGridWide: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  featureCard: {
-    backgroundColor: "#efeadf",
-    borderRadius: 28,
-    padding: 18,
+  signalPanelLight: {
+    backgroundColor: "#ece8e0",
     borderWidth: 1,
-    borderColor: palette.line,
+    borderColor: "#d2ccc1",
+    minHeight: 210,
+    justifyContent: "space-between",
   },
-  featureCardWide: {
-    width: "31%",
-    minWidth: 230,
-    flexGrow: 1,
+  signalBigNumber: {
+    color: palette.ink,
+    fontSize: 66,
+    lineHeight: 66,
+    fontFamily: fonts.display,
   },
-  featureEyebrow: {
-    color: palette.muted,
-    fontSize: 12,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 1.1,
-  },
-  featureTitle: {
-    marginTop: 10,
-    color: palette.text,
-    fontSize: 24,
-    lineHeight: 30,
-    fontWeight: "900",
-  },
-  featureBody: {
-    marginTop: 10,
-    color: palette.muted,
+  signalCaption: {
+    color: "#585962",
     fontSize: 15,
     lineHeight: 24,
+    maxWidth: 250,
+    fontFamily: fonts.sans,
   },
-  darkBand: {
-    backgroundColor: palette.card,
-    borderRadius: 32,
-    padding: 20,
-    gap: 14,
+  signalPanelAccent: {
+    backgroundColor: "#253129",
+    minHeight: 210,
+    justifyContent: "center",
+    gap: 12,
   },
-  sectionHeaderRow: {
+  miniStripRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
-  inlineLimeLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#3b4037",
-  },
-  pillarList: {
-    gap: 12,
-    marginTop: 6,
-  },
-  pillarRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 12,
-    backgroundColor: palette.cardSoft,
-    borderRadius: 20,
-    padding: 14,
-  },
-  pillarBullet: {
-    width: 10,
-    height: 10,
+  miniStripDot: {
+    width: 8,
+    height: 8,
     borderRadius: 999,
-    backgroundColor: palette.lime,
-    marginTop: 6,
+    backgroundColor: palette.saffron,
   },
-  pillarText: {
-    flex: 1,
+  miniStripText: {
+    color: "#d2d6cf",
+    fontSize: 14,
+    lineHeight: 22,
+    fontFamily: fonts.sans,
+  },
+  archiveHeader: {
+    borderRadius: 34,
+    padding: 22,
+    backgroundColor: "#17181d",
+  },
+  archiveKicker: {
+    color: palette.saffron,
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    fontFamily: fonts.sans,
+  },
+  archiveTitle: {
     color: palette.white,
+    marginTop: 10,
+    fontSize: 36,
+    lineHeight: 42,
+    fontFamily: fonts.display,
+    maxWidth: 860,
+  },
+  mosaicGrid: {
+    gap: 16,
+  },
+  mosaicGridDesktop: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  archivePanel: {
+    borderRadius: 34,
+    padding: 16,
+    gap: 16,
+  },
+  archivePanelLight: {
+    backgroundColor: "#ece8e0",
+    borderWidth: 1,
+    borderColor: "#d3cec4",
+  },
+  archivePanelDark: {
+    backgroundColor: "#1a1c21",
+  },
+  archivePanelAccent: {
+    backgroundColor: "#8f4d38",
+  },
+  panelTallLeft: {
+    width: "48.8%",
+    minHeight: 560,
+  },
+  panelTopRight: {
+    width: "48.8%",
+    minHeight: 320,
+  },
+  panelBottomCenter: {
+    width: "31.8%",
+    minHeight: 430,
+  },
+  panelBottomRight: {
+    width: "65.8%",
+    minHeight: 430,
+  },
+  archivePanelCopy: {
+    gap: 10,
+  },
+  archivePanelTitle: {
+    color: palette.ink,
+    fontSize: 30,
+    lineHeight: 36,
+    fontFamily: fonts.display,
+  },
+  archivePanelTitleOnDark: {
+    color: palette.white,
+  },
+  archivePanelBody: {
+    color: "#5a5b64",
     fontSize: 15,
     lineHeight: 24,
-    fontWeight: "600",
+    maxWidth: 520,
+    fontFamily: fonts.sans,
   },
-  galleryRow: {
-    paddingTop: 10,
-    paddingRight: 4,
-    gap: 14,
+  archivePanelBodyOnDark: {
+    color: "#d6d8de",
   },
-  galleryCard: {
-    width: 238,
-    borderRadius: 28,
-    padding: 14,
-    backgroundColor: "#efe9dd",
+  archivePanelMedia: {
+    alignItems: "center",
+  },
+  archivePanelImage: {
+    width: "100%",
+    height: 360,
+    borderRadius: 24,
+    resizeMode: "cover",
+  },
+  dossierBand: {
+    gap: 16,
+  },
+  dossierBandDesktop: {
+    flexDirection: "row",
+  },
+  dossierCardPrimary: {
+    borderRadius: 34,
+    padding: 22,
+    backgroundColor: "#e9d5c5",
+  },
+  dossierCardPrimaryDesktop: {
+    flex: 1.15,
+  },
+  dossierLead: {
+    color: palette.ink,
+    fontSize: 34,
+    lineHeight: 40,
+    fontFamily: fonts.display,
+    maxWidth: 800,
+  },
+  dossierCardSecondary: {
+    borderRadius: 34,
+    padding: 22,
+    backgroundColor: "#ece8e0",
     borderWidth: 1,
-    borderColor: palette.line,
+    borderColor: "#d4cec4",
+    justifyContent: "center",
   },
-  galleryTitle: {
-    color: palette.text,
+  dossierMiniLabel: {
+    color: palette.ember,
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    fontFamily: fonts.sans,
+  },
+  dossierMiniBody: {
+    color: "#555760",
+    marginTop: 10,
+    fontSize: 15,
+    lineHeight: 24,
+    maxWidth: 320,
+    fontFamily: fonts.sans,
+  },
+  reelSection: {
+    overflow: "hidden",
+    borderRadius: 34,
+    paddingVertical: 22,
+    backgroundColor: "#131419",
+  },
+  reelHeader: {
+    paddingHorizontal: 22,
+    paddingBottom: 16,
+  },
+  reelEyebrow: {
+    color: palette.saffron,
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    fontFamily: fonts.sans,
+  },
+  reelTitle: {
+    color: palette.white,
+    marginTop: 10,
+    fontSize: 34,
+    lineHeight: 40,
+    fontFamily: fonts.display,
+    maxWidth: 840,
+  },
+  reelViewport: {
+    overflow: "hidden",
+    paddingVertical: 4,
+  },
+  reelTrack: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    paddingLeft: 22,
+  },
+  reelCard: {
+    borderRadius: 28,
+    padding: 12,
+    backgroundColor: "#f0ece5",
+    borderWidth: 1,
+    borderColor: "#d7d1c7",
+  },
+  reelCardLabel: {
+    color: palette.ember,
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    fontFamily: fonts.sans,
+  },
+  reelCardTitle: {
+    color: palette.ink,
+    marginTop: 4,
+    marginBottom: 12,
     fontSize: 16,
     fontWeight: "900",
-    marginBottom: 12,
+    fontFamily: fonts.sans,
   },
-  galleryImage: {
+  reelCardImage: {
     width: "100%",
     height: 420,
     borderRadius: 22,
     resizeMode: "cover",
   },
-  pricingSection: {
-    backgroundColor: palette.surface,
-    borderRadius: 32,
-    padding: 20,
-    gap: 18,
+  terminalStage: {
+    gap: 16,
   },
-  pricingSectionWide: {
-    flexDirection: "row",
+  terminalStageDesktop: {
+    flexDirection: "row-reverse",
     alignItems: "center",
   },
-  pricingCopy: {
-    gap: 10,
+  terminalPoster: {
+    alignItems: "center",
   },
-  pricingCopyWide: {
-    flex: 1,
-    paddingRight: 8,
-  },
-  pricingVisualWrap: {
-    borderRadius: 28,
-    overflow: "hidden",
-    backgroundColor: "#e8e1d4",
-  },
-  pricingVisualWrapWide: {
+  terminalPosterDesktop: {
     width: 360,
   },
-  pricingVisual: {
+  terminalPosterFrame: {
+    width: 266,
+    borderRadius: 34,
+    padding: 10,
+    backgroundColor: "#ece8e0",
+    borderWidth: 1,
+    borderColor: "#d4cec4",
+  },
+  terminalPosterImage: {
     width: "100%",
     height: 520,
+    borderRadius: 26,
     resizeMode: "cover",
   },
-  ctaPanel: {
-    backgroundColor: palette.lime,
-    borderRadius: 32,
+  terminalCopy: {
+    borderRadius: 34,
     padding: 22,
+    backgroundColor: "#17181d",
   },
-  ctaPanelEyebrow: {
-    color: "#4d5619",
+  terminalCopyDesktop: {
+    flex: 1,
+  },
+  terminalKicker: {
+    color: palette.saffron,
     fontSize: 12,
     fontWeight: "800",
+    letterSpacing: 1.2,
     textTransform: "uppercase",
-    letterSpacing: 1.1,
+    fontFamily: fonts.sans,
   },
-  ctaPanelTitle: {
+  terminalTitle: {
+    color: palette.white,
     marginTop: 10,
-    color: palette.text,
-    fontSize: 30,
-    lineHeight: 36,
-    fontWeight: "900",
+    fontSize: 36,
+    lineHeight: 42,
+    fontFamily: fonts.display,
+    maxWidth: 760,
   },
-  ctaPanelBody: {
+  terminalBody: {
+    color: "#cfd3dc",
     marginTop: 10,
-    color: "#3f4518",
     fontSize: 15,
     lineHeight: 24,
     maxWidth: 620,
+    fontFamily: fonts.sans,
   },
-  footerButton: {
+  terminalButton: {
     alignSelf: "flex-start",
     marginTop: 18,
-    backgroundColor: palette.card,
     borderRadius: 999,
+    backgroundColor: palette.white,
     paddingHorizontal: 18,
     paddingVertical: 14,
   },
-  footerButtonText: {
-    color: palette.surface,
-    fontSize: 15,
+  terminalButtonText: {
+    color: palette.ink,
+    fontSize: 14,
     fontWeight: "900",
+    fontFamily: fonts.sans,
   },
 });
