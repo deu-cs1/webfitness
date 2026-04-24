@@ -41,7 +41,7 @@ const fonts = {
 
 const screens = {
   coach: require("./assets/screenshots/coach.png"),
-  meal: require("./assets/screenshots/meal-log.png"),
+  meal: require("./assets/screenshots/scan-meals.jpeg"),
   camera: require("./assets/screenshots/camera.png"),
   metrics: require("./assets/screenshots/metrics.png"),
   activity: require("./assets/screenshots/activity.png"),
