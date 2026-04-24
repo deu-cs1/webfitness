@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
+import { useRef } from "react";
 import type { ReactNode } from "react";
-import type { ImageSourcePropType } from "react-native";
+import type { ImageSourcePropType, LayoutChangeEvent } from "react-native";
 import {
   Image,
   Platform,
@@ -51,7 +52,10 @@ const screens = {
   premium: require("./assets/screenshots/premium.png"),
 } satisfies Record<string, ImageSourcePropType>;
 
-const navItems = ["Features", "Workflow", "Screens", "Launch"];
+const navItems = ["Features", "Workflow", "Plans", "Launch"] as const;
+
+type NavItem = (typeof navItems)[number];
+type SectionOffsets = Partial<Record<NavItem, number>>;
 
 const signalCards = [
   { label: "Calories", value: "620 kcal", tone: "green" as const },
@@ -145,13 +149,32 @@ export default function App() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1080;
   const isWide = width >= 760;
+  const scrollViewRef = useRef<ScrollView>(null);
+  const sectionOffsets = useRef<SectionOffsets>({});
+
+  const registerSection = (section: NavItem) => (event: LayoutChangeEvent) => {
+    sectionOffsets.current[section] = event.nativeEvent.layout.y;
+  };
+
+  const handleNavPress = (section: NavItem) => {
+    const sectionOffset = sectionOffsets.current[section];
+
+    if (typeof sectionOffset !== "number") {
+      return;
+    }
+
+    scrollViewRef.current?.scrollTo({
+      y: Math.max(sectionOffset - 18, 0),
+      animated: true,
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollViewRef} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={styles.shell}>
-          <Header isWide={isWide} />
+          <Header isWide={isWide} onNavPress={handleNavPress} />
 
           <View style={[styles.hero, isDesktop && styles.heroDesktop]}>
             <View style={[styles.heroCopy, isDesktop && styles.heroCopyDesktop]}>
@@ -185,7 +208,7 @@ export default function App() {
             ))}
           </View>
 
-          <Section>
+          <Section onLayout={registerSection("Features")}>
             <SectionHeader
               kicker="Feature showcase"
               title="Simple experiences powered by smarter context."
@@ -198,7 +221,7 @@ export default function App() {
             </View>
           </Section>
 
-          <View style={styles.workflowBand}>
+          <View style={styles.workflowBand} onLayout={registerSection("Workflow")}>
             <SectionHeader
               kicker="How it works"
               title="Capture, analyze, coach."
@@ -215,7 +238,7 @@ export default function App() {
             </View>
           </View>
 
-          <Section>
+          <Section onLayout={registerSection("Plans")}>
             <SectionHeader
               kicker="Plans"
               title="Three clear ways to grow with the product."
@@ -228,7 +251,7 @@ export default function App() {
             </View>
           </Section>
 
-          <View style={[styles.launchBand, isDesktop && styles.launchBandDesktop]}>
+          <View style={[styles.launchBand, isDesktop && styles.launchBandDesktop]} onLayout={registerSection("Launch")}>
             <View style={styles.launchCopy}>
               <Text style={styles.kicker}>Launch smarter fitness experiences</Text>
               <Text style={styles.launchTitle}>
@@ -249,7 +272,7 @@ export default function App() {
   );
 }
 
-function Header({ isWide }: { isWide: boolean }) {
+function Header({ isWide, onNavPress }: { isWide: boolean; onNavPress: (item: NavItem) => void }) {
   return (
     <View style={styles.header}>
       <View style={styles.brand}>
@@ -261,9 +284,9 @@ function Header({ isWide }: { isWide: boolean }) {
       {isWide ? (
         <View style={styles.nav}>
           {navItems.map((item) => (
-            <Text key={item} style={styles.navText}>
-              {item}
-            </Text>
+            <TouchableOpacity key={item} activeOpacity={0.72} onPress={() => onNavPress(item)}>
+              <Text style={styles.navText}>{item}</Text>
+            </TouchableOpacity>
           ))}
         </View>
       ) : null}
@@ -292,8 +315,12 @@ function HeroProductVisual({ isDesktop }: { isDesktop: boolean }) {
   );
 }
 
-function Section({ children }: { children: ReactNode }) {
-  return <View style={styles.section}>{children}</View>;
+function Section({ children, onLayout }: { children: ReactNode; onLayout?: (event: LayoutChangeEvent) => void }) {
+  return (
+    <View style={styles.section} onLayout={onLayout}>
+      {children}
+    </View>
+  );
 }
 
 function SectionHeader({
