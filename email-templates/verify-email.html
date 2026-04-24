@@ -1,0 +1,343 @@
+﻿<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="supported-color-schemes" content="light" />
+    <title>Hesabını doğrula</title>
+    <style>
+      body,
+      table,
+      td,
+      a {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+
+      table,
+      td {
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+
+      img {
+        -ms-interpolation-mode: bicubic;
+        border: 0;
+        height: auto;
+        line-height: 100%;
+        outline: none;
+        text-decoration: none;
+      }
+
+      table {
+        border-collapse: collapse !important;
+      }
+
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        background: #f5f7fb;
+        color: #263241;
+        font-family: Inter, "Segoe UI", Arial, sans-serif;
+      }
+
+      a {
+        color: #2563eb;
+      }
+
+      .email-shell {
+        width: 100%;
+        background: #f5f7fb;
+        padding: 32px 16px;
+      }
+
+      .email-container {
+        width: 100%;
+        max-width: 640px;
+        margin: 0 auto;
+      }
+
+      .preheader {
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        color: transparent;
+        font-size: 1px;
+        line-height: 1px;
+      }
+
+      .brand-row {
+        padding: 0 0 18px;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 15px;
+        background: #12a870;
+        color: #ffffff;
+        font-size: 20px;
+        font-weight: 800;
+        line-height: 42px;
+        text-align: center;
+      }
+
+      .brand-name {
+        padding-left: 12px;
+        color: #101828;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+      }
+
+      .card {
+        overflow: hidden;
+        border: 1px solid #dde4ee;
+        border-radius: 28px;
+        background: #ffffff;
+      }
+
+      .hero {
+        padding: 34px 34px 22px;
+        background: #ffffff;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid #bfd0ff;
+        border-radius: 999px;
+        background: #eaf1ff;
+        color: #2563eb;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 18px 0 12px;
+        color: #101828;
+        font-size: 34px;
+        font-weight: 800;
+        line-height: 1.12;
+        letter-spacing: -1.2px;
+      }
+
+      .lead {
+        margin: 0;
+        color: #667085;
+        font-size: 16px;
+        line-height: 1.65;
+      }
+
+      .action-panel {
+        padding: 0 34px 34px;
+      }
+
+      .progress-box {
+        margin: 0 0 24px;
+        padding: 18px;
+        border: 1px solid #dde4ee;
+        border-radius: 22px;
+        background: #f8fbff;
+      }
+
+      .progress-title {
+        margin: 0 0 10px;
+        color: #101828;
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      .step {
+        padding: 12px 0;
+        border-top: 1px solid #eef2f7;
+      }
+
+      .step:first-of-type {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .step-number {
+        width: 30px;
+        height: 30px;
+        border-radius: 12px;
+        background: #e9f8f1;
+        color: #12a870;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 30px;
+        text-align: center;
+      }
+
+      .step-copy {
+        padding-left: 12px;
+        color: #667085;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .button {
+        display: inline-block;
+        padding: 16px 24px;
+        border-radius: 16px;
+        background: #2563eb;
+        color: #ffffff !important;
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      .fallback {
+        margin: 22px 0 0;
+        color: #667085;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .fallback a {
+        word-break: break-all;
+      }
+
+      .note-row {
+        padding: 22px 34px 32px;
+        border-top: 1px solid #eef2f7;
+        background: #fbfcff;
+      }
+
+      .note {
+        padding: 14px;
+        border: 1px solid #ffd8c4;
+        border-radius: 18px;
+        background: #fff1e8;
+      }
+
+      .note-title {
+        margin: 0 0 5px;
+        color: #b95028;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .note-copy {
+        margin: 0;
+        color: #7a4028;
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .footer {
+        padding: 20px 8px 0;
+        color: #667085;
+        font-size: 12px;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      @media screen and (max-width: 520px) {
+        .email-shell {
+          padding: 20px 12px;
+        }
+
+        .hero,
+        .action-panel,
+        .note-row {
+          padding-left: 22px !important;
+          padding-right: 22px !important;
+        }
+
+        h1 {
+          font-size: 28px !important;
+        }
+
+        .button {
+          display: block !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="preheader">KineticFit AI hesabını doğrulamak için son adımı tamamla.</div>
+    <table role="presentation" class="email-shell" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center">
+          <table role="presentation" class="email-container" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td class="brand-row">
+                <table role="presentation" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td><div class="brand-mark">K</div></td>
+                    <td class="brand-name">KineticFit AI</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td class="card">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td class="hero">
+                      <span class="pill">Hesap doğrulama</span>
+                      <h1>Fitness yolculuğun için son adım.</h1>
+                      <p class="lead">
+                        Merhaba {{name}}, KineticFit AI hesabını aktif hale getirmek için e-posta adresini doğrulaman yeterli.
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="action-panel">
+                      <div class="progress-box">
+                        <p class="progress-title">Doğrulamadan sonra</p>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                          <tr class="step">
+                            <td width="30" valign="top"><div class="step-number">1</div></td>
+                            <td class="step-copy">Hesabın güvenli şekilde aktif olur.</td>
+                          </tr>
+                          <tr class="step">
+                            <td width="30" valign="top"><div class="step-number">2</div></td>
+                            <td class="step-copy">Beslenme, antrenman ve ilerleme özelliklerine erişebilirsin.</td>
+                          </tr>
+                          <tr class="step">
+                            <td width="30" valign="top"><div class="step-number">3</div></td>
+                            <td class="step-copy">AI koçun hedeflerine göre daha doğru öneriler üretmeye başlar.</td>
+                          </tr>
+                        </table>
+                      </div>
+                      <a class="button" href="{{verification_link}}" target="_blank" rel="noopener">Hesabımı Doğrula</a>
+                      <p class="fallback">
+                        Buton çalışmazsa bu bağlantıyı tarayıcına kopyala:<br />
+                        <a href="{{verification_link}}" target="_blank" rel="noopener">{{verification_link}}</a>
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="note-row">
+                      <div class="note">
+                        <p class="note-title">Not</p>
+                        <p class="note-copy">Bu kaydı sen oluşturmadıysan maili yok sayabilirsin; işlem tamamlanmadan hesap aktifleşmez.</p>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td class="footer">
+                Bu e-posta KineticFit AI hesap doğrulaması için gönderildi.<br />
+                © {{year}} KineticFit AI. Tüm hakları saklıdır.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
