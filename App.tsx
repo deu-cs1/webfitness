@@ -73,12 +73,19 @@ const productSignals = [
     body: "Clean dashboards for adherence, activity, nutrition, recovery, streaks, and weekly momentum.",
   },
   {
-    title: "Premium plans",
+    title: "Pro plans",
     body: "A stronger upgrade path built around personalized intelligence, plan comparison, and AI-led value.",
   },
 ];
 
 const featureRows = [
+  {
+    kicker: "Track progress",
+    title: "Show habit change without overwhelming users.",
+    body: "Metrics stay visual and calm, helping users see momentum across training, nutrition, and recovery. The screen can summarize streaks, calories, workout consistency, body metrics, and readiness in a way that feels encouraging instead of clinical.",
+    image: screens.metrics,
+    reverse: true,
+  },
   {
     kicker: "Scan meals",
     title: "Make nutrition tracking feel instant.",
@@ -88,7 +95,7 @@ const featureRows = [
   },
   {
     kicker: "Coach decisions",
-    title: "Turn raw app data into practical guidance.",
+    title: "Create meal plans and weekly programs with your AI coach",
     body: "The coach can combine meals, workouts, rest, goals, conversations, and user requests into one simple recommendation users can act on. It can create training programs from what users ask for, explain why a workout should be lighter, when to eat more protein, or how to recover after a difficult week.",
     image: screens.coach,
     secondaryImage: screens.programTop,
@@ -100,13 +107,6 @@ const featureRows = [
     body: "Studio gives trainers and power users a cleaner place to shape programs, adjust routines, and keep the coaching experience organized. It can hold weekly schedules, exercise notes, rest days, and plan updates without crowding the user's main dashboard.",
     image: screens.studioActivity,
     reverse: false,
-  },
-  {
-    kicker: "Track progress",
-    title: "Show habit change without overwhelming users.",
-    body: "Metrics stay visual and calm, helping users see momentum across training, nutrition, and recovery. The screen can summarize streaks, calories, workout consistency, body metrics, and readiness in a way that feels encouraging instead of clinical.",
-    image: screens.metrics,
-    reverse: true,
   },
 ];
 
@@ -157,7 +157,7 @@ export default function App() {
             <View style={[styles.heroCopy, isDesktop && styles.heroCopyDesktop]}>
               <Text style={styles.kicker}>AI coaching layer for fitness apps</Text>
               <Text style={[styles.heroTitle, isDesktop && styles.heroTitleDesktop]}>
-                Add nutrition scanning and adaptive coaching to your fitness product.
+                THE nutrition scanning and adaptive coaching app for your fitness journey
               </Text>
               <Text style={styles.heroBody}>
                 A clean product layer for meal recognition, daily recommendations, progress insights, and premium
