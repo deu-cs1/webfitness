@@ -4,13 +4,13 @@
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "dev": "expo start --web",
+    "dev": "set EXPO_OFFLINE=1&& set EXPO_NO_DEPENDENCY_VALIDATION=1&& expo start --web --localhost --port 8081",
     "build": "expo export -p web --max-workers 1",
     "preview": "expo serve dist",
-    "start": "expo start",
+    "start": "set EXPO_OFFLINE=1&& set EXPO_NO_DEPENDENCY_VALIDATION=1&& expo start --localhost",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "set EXPO_OFFLINE=1&& set EXPO_NO_DEPENDENCY_VALIDATION=1&& expo start --web --localhost --port 8081"
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.5",

@@ -40,9 +40,12 @@ const screens = {
   coach: require("./assets/screenshots/coach.png"),
   meal: require("./assets/screenshots/scan-meals.jpeg"),
   camera: require("./assets/screenshots/camera.png"),
+  mealReady: require("./assets/screenshots/meal-ready.png"),
   metrics: require("./assets/screenshots/metrics.png"),
   activity: require("./assets/screenshots/activity.png"),
   program: require("./assets/screenshots/program.png"),
+  programTop: require("./assets/screenshots/program-top.png"),
+  studioActivity: require("./assets/screenshots/studio-activity.png"),
   rest: require("./assets/screenshots/rest.png"),
   notifications: require("./assets/screenshots/notifications.png"),
   premium: require("./assets/screenshots/premium.png"),
@@ -86,15 +89,16 @@ const featureRows = [
   {
     kicker: "Coach decisions",
     title: "Turn raw app data into practical guidance.",
-    body: "The coach can combine meals, workouts, rest, and goals into one simple recommendation users can act on. It can explain why a workout should be lighter, when to eat more protein, or how to recover after a difficult week.",
+    body: "The coach can combine meals, workouts, rest, goals, conversations, and user requests into one simple recommendation users can act on. It can create training programs from what users ask for, explain why a workout should be lighter, when to eat more protein, or how to recover after a difficult week.",
     image: screens.coach,
+    secondaryImage: screens.programTop,
     reverse: true,
   },
   {
     kicker: "Studio",
     title: "Create and manage training plans in one focused workspace.",
     body: "Studio gives trainers and power users a cleaner place to shape programs, adjust routines, and keep the coaching experience organized. It can hold weekly schedules, exercise notes, rest days, and plan updates without crowding the user's main dashboard.",
-    image: screens.program,
+    image: screens.studioActivity,
     reverse: false,
   },
   {
@@ -274,7 +278,7 @@ function HeroProductVisual({ isDesktop }: { isDesktop: boolean }) {
   return (
     <View style={[styles.heroVisual, isDesktop && styles.heroVisualDesktop]}>
       <View style={styles.heroPhoneWrap}>
-        <PhoneFrame image={screens.camera} size={isDesktop ? "hero" : "large"} />
+        <PhoneFrame image={screens.mealReady} size={isDesktop ? "hero" : "large"} />
       </View>
       <View style={styles.floatingStack}>
         {signalCards.map((card) => (
@@ -315,6 +319,7 @@ function FeatureRow({
   title,
   body,
   image,
+  secondaryImage,
   reverse,
   isDesktop,
 }: {
@@ -322,9 +327,12 @@ function FeatureRow({
   title: string;
   body: string;
   image: ImageSourcePropType;
+  secondaryImage?: ImageSourcePropType;
   reverse: boolean;
   isDesktop: boolean;
 }) {
+  const phoneSize = secondaryImage ? (isDesktop ? "paired" : "compact") : "large";
+
   return (
     <View style={[styles.featureRow, isDesktop && styles.featureRowDesktop, reverse && isDesktop && styles.featureRowReverse]}>
       <View style={styles.featureCopy}>
@@ -332,8 +340,9 @@ function FeatureRow({
         <Text style={styles.featureTitle}>{title}</Text>
         <Text style={styles.featureBody}>{body}</Text>
       </View>
-      <View style={styles.featureVisual}>
-        <PhoneFrame image={image} size="large" />
+      <View style={[styles.featureVisual, secondaryImage ? styles.featureVisualPair : undefined]}>
+        <PhoneFrame image={image} size={phoneSize} />
+        {secondaryImage ? <PhoneFrame image={secondaryImage} size={phoneSize} /> : null}
       </View>
     </View>
   );
@@ -375,13 +384,15 @@ function PlanCard({
   );
 }
 
-function PhoneFrame({ image, size }: { image: ImageSourcePropType; size: "hero" | "large" }) {
+function PhoneFrame({ image, size }: { image: ImageSourcePropType; size: "hero" | "large" | "paired" | "compact" }) {
   return (
     <View
       style={[
         styles.phoneFrame,
         size === "hero" && styles.phoneHero,
         size === "large" && styles.phoneLarge,
+        size === "paired" && styles.phonePaired,
+        size === "compact" && styles.phoneCompact,
       ]}
     >
       <Image source={image} style={styles.phoneImage} />
@@ -632,6 +643,14 @@ const styles = StyleSheet.create({
     width: 214,
     height: 446,
   },
+  phonePaired: {
+    width: 176,
+    height: 367,
+  },
+  phoneCompact: {
+    width: 140,
+    height: 292,
+  },
   phoneImage: {
     width: "100%",
     height: "100%",
@@ -734,6 +753,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: palette.faint,
     paddingVertical: 24,
+  },
+  featureVisualPair: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    gap: 12,
+    paddingHorizontal: 12,
   },
   workflowBand: {
     borderRadius: 8,
