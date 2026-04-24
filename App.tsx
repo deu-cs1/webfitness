@@ -62,19 +62,19 @@ const signalCards = [
 const productSignals = [
   {
     title: "Food scan",
-    body: "Photo-based meal logging with calories, macros, and portion context.",
+    body: "Photo-based meal logging with calories, macros, portion context, and a clean daily nutrition history.",
   },
   {
     title: "AI coach",
-    body: "Daily guidance that reacts to meals, workouts, rest, and consistency.",
+    body: "Daily guidance that reacts to meals, workouts, rest, consistency, and the user's current goal.",
   },
   {
     title: "Progress insights",
-    body: "Clean dashboards for adherence, activity, nutrition, and recovery.",
+    body: "Clean dashboards for adherence, activity, nutrition, recovery, streaks, and weekly momentum.",
   },
   {
     title: "Premium plans",
-    body: "A stronger upgrade path built around personalized intelligence.",
+    body: "A stronger upgrade path built around personalized intelligence, plan comparison, and AI-led value.",
   },
 ];
 
@@ -82,23 +82,30 @@ const featureRows = [
   {
     kicker: "Scan meals",
     title: "Make nutrition tracking feel instant.",
-    body: "Users capture a meal, receive structured nutrition feedback, and understand how that choice affects the rest of the day.",
+    body: "Users capture a meal, receive structured nutrition feedback, and understand how that choice affects the rest of the day. The screen can show calories, protein, carbs, fats, meal timing, and whether the meal supports today's target.",
     image: screens.meal,
     reverse: false,
   },
   {
     kicker: "Coach decisions",
     title: "Turn raw app data into practical guidance.",
-    body: "The coach can combine meals, workouts, rest, and goals into one simple recommendation users can act on.",
+    body: "The coach can combine meals, workouts, rest, and goals into one simple recommendation users can act on. It can explain why a workout should be lighter, when to eat more protein, or how to recover after a difficult week.",
     image: screens.coach,
     reverse: true,
   },
   {
+    kicker: "Studio",
+    title: "Create and manage training plans in one focused workspace.",
+    body: "Studio gives trainers and power users a cleaner place to shape programs, adjust routines, and keep the coaching experience organized. It can hold weekly schedules, exercise notes, rest days, and plan updates without crowding the user's main dashboard.",
+    image: screens.program,
+    reverse: false,
+  },
+  {
     kicker: "Track progress",
     title: "Show habit change without overwhelming users.",
-    body: "Metrics stay visual and calm, helping users see momentum across training, nutrition, and recovery.",
+    body: "Metrics stay visual and calm, helping users see momentum across training, nutrition, and recovery. The screen can summarize streaks, calories, workout consistency, body metrics, and readiness in a way that feels encouraging instead of clinical.",
     image: screens.metrics,
-    reverse: false,
+    reverse: true,
   },
 ];
 
@@ -108,13 +115,39 @@ const workflow = [
   { step: "03", title: "Coach", body: "Your app returns a useful next action in seconds." },
 ];
 
+const plans = [
+  {
+    name: "Freemium",
+    label: "Start",
+    description: "A simple entry plan for users who want to explore the core fitness experience.",
+    features: ["Basic activity view", "Program previews", "Progress overview"],
+    highlighted: false,
+  },
+  {
+    name: "Pro",
+    label: "Nutrition",
+    description: "For users who want to understand meals and keep daily calories under control.",
+    features: ["Everything in Freemium", "Calorie tracking", "Meal scan history", "Macro breakdown"],
+    highlighted: true,
+  },
+  {
+    name: "Pro Plus",
+    label: "Coach",
+    description: "For users who want calorie tracking plus direct conversations with the AI coach.",
+    features: ["Everything in Pro", "Chat with AI coach", "Personalized next actions", "Smarter plan adjustments"],
+    highlighted: false,
+    premium: true,
+  },
+];
+
 const gallery = [
-  { title: "Camera", image: screens.camera },
-  { title: "Activity", image: screens.activity },
-  { title: "Program", image: screens.program },
-  { title: "Rest", image: screens.rest },
-  { title: "Premium", image: screens.premium },
-  { title: "Alerts", image: screens.notifications },
+  { title: "Camera", body: "Capture meals, progress photos, or quick check-ins.", image: screens.camera },
+  { title: "Activity", body: "Track daily movement and see what needs attention.", image: screens.activity },
+  { title: "Studio", body: "Organize plans, routines, and training structure.", image: screens.program },
+  { title: "Program", body: "Follow a weekly plan with simple workout tasks.", image: screens.program },
+  { title: "Rest", body: "Guide recovery with timers and rest recommendations.", image: screens.rest },
+  { title: "Premium", body: "Compare plans and highlight upgrade value clearly.", image: screens.premium },
+  { title: "Alerts", body: "Control reminders for meals, workouts, and coach nudges.", image: screens.notifications },
 ];
 
 export default function App() {
@@ -200,6 +233,19 @@ export default function App() {
             <MovingGallery viewportWidth={width} items={gallery} />
           </Section>
 
+          <Section>
+            <SectionHeader
+              kicker="Plans"
+              title="Three clear ways to grow with the product."
+              body="Users can begin free, upgrade for calorie tracking, and move to Pro Plus when they want direct AI coaching."
+            />
+            <View style={[styles.planGrid, isDesktop && styles.planGridDesktop]}>
+              {plans.map((plan) => (
+                <PlanCard key={plan.name} {...plan} />
+              ))}
+            </View>
+          </Section>
+
           <View style={[styles.launchBand, isDesktop && styles.launchBandDesktop]}>
             <View style={styles.launchCopy}>
               <Text style={styles.kicker}>Launch smarter fitness experiences</Text>
@@ -268,7 +314,15 @@ function Section({ children }: { children: ReactNode }) {
   return <View style={styles.section}>{children}</View>;
 }
 
-function SectionHeader({ kicker, title, body }: { kicker: string; title: string; body?: string }) {
+function SectionHeader({
+  kicker,
+  title,
+  body,
+}: {
+  kicker: string;
+  title: string;
+  body?: string;
+}) {
   return (
     <View style={styles.sectionHeader}>
       <Text style={styles.kicker}>{kicker}</Text>
@@ -312,10 +366,10 @@ function MovingGallery({
   items,
 }: {
   viewportWidth: number;
-  items: { title: string; image: ImageSourcePropType }[];
+  items: { title: string; body: string; image: ImageSourcePropType }[];
 }) {
   const translateX = useRef(new Animated.Value(0)).current;
-  const cardWidth = viewportWidth >= 1080 ? 190 : 172;
+  const cardWidth = viewportWidth >= 1080 ? 228 : 200;
   const gap = 14;
   const trackWidth = items.length * (cardWidth + gap);
   const duplicated = [...items, ...items];
@@ -340,11 +394,50 @@ function MovingGallery({
       <Animated.View style={[styles.galleryTrack, { transform: [{ translateX }] }]}>
         {duplicated.map((item, index) => (
           <View key={`${item.title}-${index}`} style={[styles.galleryCard, { width: cardWidth, marginRight: gap }]}>
-            <Text style={styles.galleryTitle}>{item.title}</Text>
+            <View style={styles.galleryCopy}>
+              <Text style={styles.galleryTitle}>{item.title}</Text>
+              <Text style={styles.galleryBody}>{item.body}</Text>
+            </View>
             <PhoneFrame image={item.image} size="gallery" />
           </View>
         ))}
       </Animated.View>
+    </View>
+  );
+}
+
+function PlanCard({
+  name,
+  label,
+  description,
+  features,
+  highlighted,
+  premium,
+}: {
+  name: string;
+  label: string;
+  description: string;
+  features: string[];
+  highlighted: boolean;
+  premium?: boolean;
+}) {
+  return (
+    <View style={[styles.planCard, highlighted && styles.planCardHighlighted, premium && styles.planCardPremium]}>
+      <View style={styles.planTopRow}>
+        <Text style={styles.planName}>{name}</Text>
+        <View style={[styles.planLabel, highlighted && styles.planLabelHighlighted, premium && styles.planLabelPremium]}>
+          <Text style={[styles.planLabelText, (highlighted || premium) && styles.planLabelTextHighlighted]}>{label}</Text>
+        </View>
+      </View>
+      <Text style={styles.planDescription}>{description}</Text>
+      <View style={styles.planFeatureList}>
+        {features.map((feature) => (
+          <View key={feature} style={styles.planFeatureRow}>
+            <View style={[styles.planCheck, highlighted && styles.planCheckHighlighted, premium && styles.planCheckPremium]} />
+            <Text style={styles.planFeatureText}>{feature}</Text>
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
@@ -466,10 +559,17 @@ const styles = StyleSheet.create({
     paddingRight: 28,
   },
   kicker: {
+    alignSelf: "flex-start",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#cbeedd",
+    backgroundColor: palette.greenSoft,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     color: palette.green,
-    fontSize: 12,
+    fontSize: 15,
     fontWeight: "900",
-    letterSpacing: 0.8,
+    letterSpacing: 0.6,
     textTransform: "uppercase",
     fontFamily: fonts.sans,
   },
@@ -761,20 +861,129 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.line,
     backgroundColor: palette.white,
-    padding: 14,
+    padding: 16,
     alignItems: "center",
-    gap: 14,
+    gap: 16,
+  },
+  galleryCopy: {
+    alignSelf: "stretch",
+    gap: 6,
+    minHeight: 86,
   },
   galleryTitle: {
     color: palette.ink,
     alignSelf: "flex-start",
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: "900",
+    fontFamily: fonts.sans,
+  },
+  galleryBody: {
+    color: palette.muted,
+    alignSelf: "stretch",
+    fontSize: 13,
+    lineHeight: 20,
+    fontFamily: fonts.sans,
+  },
+  planGrid: {
+    gap: 18,
+  },
+  planGridDesktop: {
+    flexDirection: "row",
+    alignItems: "stretch",
+  },
+  planCard: {
+    flex: 1,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: palette.white,
+    padding: 26,
+    gap: 20,
+    minHeight: 340,
+  },
+  planCardHighlighted: {
+    borderColor: "#bdebd7",
+    backgroundColor: palette.greenSoft,
+  },
+  planCardPremium: {
+    borderColor: "#bfd0ff",
+    backgroundColor: palette.blueSoft,
+  },
+  planTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  planName: {
+    color: palette.ink,
+    fontSize: 30,
+    lineHeight: 36,
+    fontWeight: "900",
+    fontFamily: fonts.sans,
+  },
+  planLabel: {
+    borderRadius: 8,
+    backgroundColor: palette.faint,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  planLabelHighlighted: {
+    backgroundColor: palette.green,
+  },
+  planLabelPremium: {
+    backgroundColor: palette.blue,
+  },
+  planLabelText: {
+    color: palette.muted,
+    fontSize: 11,
+    fontWeight: "900",
+    textTransform: "uppercase",
+    fontFamily: fonts.sans,
+  },
+  planLabelTextHighlighted: {
+    color: palette.white,
+  },
+  planDescription: {
+    color: palette.muted,
+    fontSize: 17,
+    lineHeight: 27,
+    fontFamily: fonts.sans,
+  },
+  planFeatureList: {
+    gap: 14,
+    marginTop: 4,
+  },
+  planFeatureRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  planCheck: {
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: palette.blue,
+  },
+  planCheckHighlighted: {
+    backgroundColor: palette.green,
+  },
+  planCheckPremium: {
+    backgroundColor: palette.blue,
+  },
+  planFeatureText: {
+    flex: 1,
+    color: palette.text,
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: "700",
     fontFamily: fonts.sans,
   },
   launchBand: {
     borderRadius: 8,
-    backgroundColor: palette.ink,
+    backgroundColor: palette.greenSoft,
+    borderWidth: 1,
+    borderColor: "#cbeedd",
     padding: 24,
     gap: 20,
     marginBottom: 12,
@@ -790,7 +999,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   launchTitle: {
-    color: palette.white,
+    color: palette.ink,
     fontSize: 36,
     lineHeight: 42,
     fontWeight: "900",
@@ -798,7 +1007,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.sans,
   },
   launchBody: {
-    color: "#c7d1df",
+    color: palette.muted,
     fontSize: 16,
     lineHeight: 26,
     maxWidth: 640,
