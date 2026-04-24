@@ -1,10 +1,7 @@
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import type { ImageSourcePropType } from "react-native";
 import {
-  Animated,
-  Easing,
   Image,
   Platform,
   SafeAreaView,
@@ -140,16 +137,6 @@ const plans = [
   },
 ];
 
-const gallery = [
-  { title: "Camera", body: "Capture meals, progress photos, or quick check-ins.", image: screens.camera },
-  { title: "Activity", body: "Track daily movement and see what needs attention.", image: screens.activity },
-  { title: "Studio", body: "Organize plans, routines, and training structure.", image: screens.program },
-  { title: "Program", body: "Follow a weekly plan with simple workout tasks.", image: screens.program },
-  { title: "Rest", body: "Guide recovery with timers and rest recommendations.", image: screens.rest },
-  { title: "Premium", body: "Compare plans and highlight upgrade value clearly.", image: screens.premium },
-  { title: "Alerts", body: "Control reminders for meals, workouts, and coach nudges.", image: screens.notifications },
-];
-
 export default function App() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1080;
@@ -223,15 +210,6 @@ export default function App() {
               ))}
             </View>
           </View>
-
-          <Section>
-            <SectionHeader
-              kicker="App screen gallery"
-              title="A complete fitness experience, not a single feature."
-              body="Nutrition scanning works best when it connects to programs, recovery, notifications, and premium moments."
-            />
-            <MovingGallery viewportWidth={width} items={gallery} />
-          </Section>
 
           <Section>
             <SectionHeader
@@ -361,51 +339,6 @@ function FeatureRow({
   );
 }
 
-function MovingGallery({
-  viewportWidth,
-  items,
-}: {
-  viewportWidth: number;
-  items: { title: string; body: string; image: ImageSourcePropType }[];
-}) {
-  const translateX = useRef(new Animated.Value(0)).current;
-  const cardWidth = viewportWidth >= 1080 ? 228 : 200;
-  const gap = 14;
-  const trackWidth = items.length * (cardWidth + gap);
-  const duplicated = [...items, ...items];
-
-  useEffect(() => {
-    translateX.setValue(0);
-    const animation = Animated.loop(
-      Animated.timing(translateX, {
-        toValue: -trackWidth,
-        duration: 32000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    );
-
-    animation.start();
-    return () => animation.stop();
-  }, [trackWidth, translateX]);
-
-  return (
-    <View style={styles.galleryViewport}>
-      <Animated.View style={[styles.galleryTrack, { transform: [{ translateX }] }]}>
-        {duplicated.map((item, index) => (
-          <View key={`${item.title}-${index}`} style={[styles.galleryCard, { width: cardWidth, marginRight: gap }]}>
-            <View style={styles.galleryCopy}>
-              <Text style={styles.galleryTitle}>{item.title}</Text>
-              <Text style={styles.galleryBody}>{item.body}</Text>
-            </View>
-            <PhoneFrame image={item.image} size="gallery" />
-          </View>
-        ))}
-      </Animated.View>
-    </View>
-  );
-}
-
 function PlanCard({
   name,
   label,
@@ -442,14 +375,13 @@ function PlanCard({
   );
 }
 
-function PhoneFrame({ image, size }: { image: ImageSourcePropType; size: "hero" | "large" | "gallery" }) {
+function PhoneFrame({ image, size }: { image: ImageSourcePropType; size: "hero" | "large" }) {
   return (
     <View
       style={[
         styles.phoneFrame,
         size === "hero" && styles.phoneHero,
         size === "large" && styles.phoneLarge,
-        size === "gallery" && styles.phoneGallery,
       ]}
     >
       <Image source={image} style={styles.phoneImage} />
@@ -700,10 +632,6 @@ const styles = StyleSheet.create({
     width: 214,
     height: 446,
   },
-  phoneGallery: {
-    width: 160,
-    height: 334,
-  },
   phoneImage: {
     width: "100%",
     height: "100%",
@@ -844,44 +772,6 @@ const styles = StyleSheet.create({
     color: palette.muted,
     fontSize: 15,
     lineHeight: 24,
-    fontFamily: fonts.sans,
-  },
-  galleryViewport: {
-    overflow: "hidden",
-    marginHorizontal: -18,
-    paddingHorizontal: 18,
-    paddingVertical: 4,
-  },
-  galleryTrack: {
-    flexDirection: "row",
-    alignItems: "stretch",
-  },
-  galleryCard: {
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: palette.line,
-    backgroundColor: palette.white,
-    padding: 16,
-    alignItems: "center",
-    gap: 16,
-  },
-  galleryCopy: {
-    alignSelf: "stretch",
-    gap: 6,
-    minHeight: 86,
-  },
-  galleryTitle: {
-    color: palette.ink,
-    alignSelf: "flex-start",
-    fontSize: 17,
-    fontWeight: "900",
-    fontFamily: fonts.sans,
-  },
-  galleryBody: {
-    color: palette.muted,
-    alignSelf: "stretch",
-    fontSize: 13,
-    lineHeight: 20,
     fontFamily: fonts.sans,
   },
   planGrid: {
