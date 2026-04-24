@@ -1,7 +1,10 @@
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import type { ImageSourcePropType } from "react-native";
 import {
+  Animated,
+  Easing,
   Image,
   Platform,
   SafeAreaView,
@@ -194,14 +197,7 @@ export default function App() {
               title="A complete fitness experience, not a single feature."
               body="Nutrition scanning works best when it connects to programs, recovery, notifications, and premium moments."
             />
-            <View style={[styles.galleryGrid, isDesktop && styles.galleryGridDesktop]}>
-              {gallery.map((item) => (
-                <View key={item.title} style={styles.galleryCard}>
-                  <Text style={styles.galleryTitle}>{item.title}</Text>
-                  <PhoneFrame image={item.image} size="gallery" />
-                </View>
-              ))}
-            </View>
+            <MovingGallery viewportWidth={width} items={gallery} />
           </Section>
 
           <View style={[styles.launchBand, isDesktop && styles.launchBandDesktop]}>
@@ -307,6 +303,48 @@ function FeatureRow({
       <View style={styles.featureVisual}>
         <PhoneFrame image={image} size="large" />
       </View>
+    </View>
+  );
+}
+
+function MovingGallery({
+  viewportWidth,
+  items,
+}: {
+  viewportWidth: number;
+  items: { title: string; image: ImageSourcePropType }[];
+}) {
+  const translateX = useRef(new Animated.Value(0)).current;
+  const cardWidth = viewportWidth >= 1080 ? 190 : 172;
+  const gap = 14;
+  const trackWidth = items.length * (cardWidth + gap);
+  const duplicated = [...items, ...items];
+
+  useEffect(() => {
+    translateX.setValue(0);
+    const animation = Animated.loop(
+      Animated.timing(translateX, {
+        toValue: -trackWidth,
+        duration: 32000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    );
+
+    animation.start();
+    return () => animation.stop();
+  }, [trackWidth, translateX]);
+
+  return (
+    <View style={styles.galleryViewport}>
+      <Animated.View style={[styles.galleryTrack, { transform: [{ translateX }] }]}>
+        {duplicated.map((item, index) => (
+          <View key={`${item.title}-${index}`} style={[styles.galleryCard, { width: cardWidth, marginRight: gap }]}>
+            <Text style={styles.galleryTitle}>{item.title}</Text>
+            <PhoneFrame image={item.image} size="gallery" />
+          </View>
+        ))}
+      </Animated.View>
     </View>
   );
 }
@@ -708,16 +746,17 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontFamily: fonts.sans,
   },
-  galleryGrid: {
-    gap: 14,
+  galleryViewport: {
+    overflow: "hidden",
+    marginHorizontal: -18,
+    paddingHorizontal: 18,
+    paddingVertical: 4,
   },
-  galleryGridDesktop: {
+  galleryTrack: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    alignItems: "stretch",
   },
   galleryCard: {
-    flexGrow: 1,
-    flexBasis: 170,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: palette.line,
