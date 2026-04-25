@@ -241,7 +241,7 @@ export default function App() {
           <Section onLayout={registerSection("Plans")}>
             <SectionHeader
               kicker="Plans"
-              title="Three clear ways to grow with the product."
+              title="Choose the plan that fits your fitness goals."
               body="Users can begin free, upgrade for calorie tracking, and move to Pro Plus when they want direct AI coaching."
             />
             <View style={[styles.planGrid, isDesktop && styles.planGridDesktop]}>
@@ -256,10 +256,6 @@ export default function App() {
               <Text style={styles.kicker}>Launch smarter fitness experiences</Text>
               <Text style={styles.launchTitle}>
                 Help users understand what to eat, how to train, and when to recover.
-              </Text>
-              <Text style={styles.launchBody}>
-                This direction keeps the page more original than the Spike reference, but still clean enough for a
-                serious product demo.
               </Text>
             </View>
             <TouchableOpacity activeOpacity={0.86} style={styles.primaryButton}>
@@ -279,7 +275,7 @@ function Header({ isWide, onNavPress }: { isWide: boolean; onNavPress: (item: Na
         <View style={styles.brandMark}>
           <Text style={styles.brandMarkText}>K</Text>
         </View>
-        <Text style={styles.brandText}>KineticFit AI</Text>
+        <Text style={styles.brandText}>KineticApp</Text>
       </View>
       {isWide ? (
         <View style={styles.nav}>

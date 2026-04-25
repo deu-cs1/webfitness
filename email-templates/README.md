@@ -1,4 +1,4 @@
-﻿# KineticFit AI E-posta Template'leri
+﻿# KineticApp E-posta Template'leri
 
 Bu klasörde linkle çalışan iki saf HTML/CSS e-posta template'i bulunur:
 
@@ -16,6 +16,6 @@ Template'leri mail sağlayıcına göre aşağıdaki değişkenlerle doldurabili
 
 ## Tasarım notları
 
-- Renk paleti `App.tsx` içindeki KineticFit AI tasarım diliyle uyumludur.
+- Renk paleti `App.tsx` içindeki KineticApp tasarım diliyle uyumludur.
 - E-posta istemcileri için tablo tabanlı iskelet ve responsive CSS kullanır.
 - Dış font, görsel veya framework bağımlılığı yoktur.
