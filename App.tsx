@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { ReactNode } from "react";
 import type { ImageSourcePropType, LayoutChangeEvent } from "react-native";
 import {
@@ -9,6 +9,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   useWindowDimensions,
   View,
@@ -56,6 +57,7 @@ const navItems = ["Features", "Workflow", "Plans", "Launch"] as const;
 
 type NavItem = (typeof navItems)[number];
 type SectionOffsets = Partial<Record<NavItem, number>>;
+type EmailFormTarget = "demo" | "access";
 
 const signalCards = [
   { label: "Calories", value: "620 kcal", tone: "green" as const },
@@ -151,6 +153,9 @@ export default function App() {
   const isWide = width >= 760;
   const scrollViewRef = useRef<ScrollView>(null);
   const sectionOffsets = useRef<SectionOffsets>({});
+  const [activeEmailForm, setActiveEmailForm] = useState<EmailFormTarget | null>(null);
+  const [email, setEmail] = useState("");
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
 
   const registerSection = (section: NavItem) => (event: LayoutChangeEvent) => {
     sectionOffsets.current[section] = event.nativeEvent.layout.y;
@@ -167,6 +172,19 @@ export default function App() {
       y: Math.max(sectionOffset - 18, 0),
       animated: true,
     });
+  };
+
+  const openEmailForm = (target: EmailFormTarget) => {
+    setActiveEmailForm(target);
+    setEmailSubmitted(false);
+  };
+
+  const handleEmailSubmit = () => {
+    if (!email.trim()) {
+      return;
+    }
+
+    setEmailSubmitted(true);
   };
 
   return (
@@ -187,13 +205,22 @@ export default function App() {
                 fitness experiences without making the app feel complicated.
               </Text>
               <View style={styles.heroActions}>
-                <TouchableOpacity activeOpacity={0.86} style={styles.primaryButton}>
+                <TouchableOpacity activeOpacity={0.86} style={styles.primaryButton} onPress={() => openEmailForm("demo")}>
                   <Text style={styles.primaryButtonText}>Book a demo</Text>
                 </TouchableOpacity>
                 <TouchableOpacity activeOpacity={0.86} style={styles.secondaryButton}>
                   <Text style={styles.secondaryButtonText}>See the flow</Text>
                 </TouchableOpacity>
               </View>
+              {activeEmailForm === "demo" ? (
+                <EmailCapture
+                  email={email}
+                  submitted={emailSubmitted}
+                  submitLabel="Send demo request"
+                  onChangeEmail={setEmail}
+                  onSubmit={handleEmailSubmit}
+                />
+              ) : null}
             </View>
 
             <HeroProductVisual isDesktop={isDesktop} />
@@ -258,9 +285,18 @@ export default function App() {
                 Help users understand what to eat, how to train, and when to recover.
               </Text>
             </View>
-            <TouchableOpacity activeOpacity={0.86} style={styles.primaryButton}>
+            <TouchableOpacity activeOpacity={0.86} style={styles.primaryButton} onPress={() => openEmailForm("access")}>
               <Text style={styles.primaryButtonText}>Request early access</Text>
             </TouchableOpacity>
+            {activeEmailForm === "access" ? (
+              <EmailCapture
+                email={email}
+                submitted={emailSubmitted}
+                submitLabel="Request access"
+                onChangeEmail={setEmail}
+                onSubmit={handleEmailSubmit}
+              />
+            ) : null}
           </View>
         </View>
       </ScrollView>
@@ -286,9 +322,42 @@ function Header({ isWide, onNavPress }: { isWide: boolean; onNavPress: (item: Na
           ))}
         </View>
       ) : null}
-      <TouchableOpacity activeOpacity={0.86} style={styles.headerButton}>
-        <Text style={styles.headerButtonText}>Demo</Text>
-      </TouchableOpacity>
+    </View>
+  );
+}
+
+function EmailCapture({
+  email,
+  submitted,
+  submitLabel,
+  onChangeEmail,
+  onSubmit,
+}: {
+  email: string;
+  submitted: boolean;
+  submitLabel: string;
+  onChangeEmail: (value: string) => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <View style={styles.emailCard}>
+      <Text style={styles.emailTitle}>Leave your email and we will get back to you.</Text>
+      <View style={styles.emailRow}>
+        <TextInput
+          value={email}
+          onChangeText={onChangeEmail}
+          placeholder="you@example.com"
+          placeholderTextColor={palette.muted}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          style={styles.emailInput}
+        />
+        <TouchableOpacity activeOpacity={0.86} style={styles.emailSubmitButton} onPress={onSubmit}>
+          <Text style={styles.emailSubmitText}>{submitLabel}</Text>
+        </TouchableOpacity>
+      </View>
+      {submitted ? <Text style={styles.emailSuccess}>Thanks! We received your email.</Text> : null}
     </View>
   );
 }
@@ -494,20 +563,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontFamily: fonts.sans,
   },
-  headerButton: {
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: palette.line,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    backgroundColor: palette.white,
-  },
-  headerButtonText: {
-    color: palette.ink,
-    fontSize: 13,
-    fontWeight: "900",
-    fontFamily: fonts.sans,
-  },
   hero: {
     gap: 34,
     paddingTop: 18,
@@ -589,6 +644,60 @@ const styles = StyleSheet.create({
     color: palette.ink,
     fontSize: 15,
     fontWeight: "900",
+    fontFamily: fonts.sans,
+  },
+  emailCard: {
+    maxWidth: 560,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: palette.white,
+    padding: 14,
+    gap: 12,
+  },
+  emailTitle: {
+    color: palette.text,
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: "700",
+    fontFamily: fonts.sans,
+  },
+  emailRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  emailInput: {
+    flexGrow: 1,
+    flexBasis: 240,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: palette.canvas,
+    color: palette.ink,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    fontSize: 15,
+    fontFamily: fonts.sans,
+  },
+  emailSubmitButton: {
+    borderRadius: 8,
+    backgroundColor: palette.ink,
+    paddingHorizontal: 16,
+    paddingVertical: 13,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emailSubmitText: {
+    color: palette.white,
+    fontSize: 14,
+    fontWeight: "900",
+    fontFamily: fonts.sans,
+  },
+  emailSuccess: {
+    color: palette.green,
+    fontSize: 14,
+    fontWeight: "800",
     fontFamily: fonts.sans,
   },
   heroVisual: {
