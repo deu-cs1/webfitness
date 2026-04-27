@@ -57,7 +57,8 @@ const navItems = ["Features", "Workflow", "Plans", "Launch"] as const;
 
 type NavItem = (typeof navItems)[number];
 type SectionOffsets = Partial<Record<NavItem, number>>;
-type EmailFormTarget = "demo" | "access";
+type EmailFormTarget = "access" | "demo-confirm";
+type PageView = "home" | "demo";
 
 const signalCards = [
   { label: "Calories", value: "620 kcal", tone: "green" as const },
@@ -122,6 +123,21 @@ const workflow = [
   { step: "03", title: "Coach", body: "Your app returns a useful next action in seconds." },
 ];
 
+const demoOutcomes = [
+  {
+    title: "See the core user journey",
+    body: "Walk through scanning a meal, checking the daily plan, reviewing progress, and receiving a coach recommendation.",
+  },
+  {
+    title: "Understand the premium path",
+    body: "Preview how calorie tracking, AI coaching, and plan upgrades can become clear reasons for users to subscribe.",
+  },
+  {
+    title: "Map it to your product",
+    body: "Use the demo to spot where nutrition, recovery, training, and progress insights would fit into your own app.",
+  },
+];
+
 const plans = [
   {
     name: "Freemium",
@@ -153,6 +169,7 @@ export default function App() {
   const isWide = width >= 760;
   const scrollViewRef = useRef<ScrollView>(null);
   const sectionOffsets = useRef<SectionOffsets>({});
+  const [pageView, setPageView] = useState<PageView>("home");
   const [activeEmailForm, setActiveEmailForm] = useState<EmailFormTarget | null>(null);
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
@@ -174,6 +191,20 @@ export default function App() {
     });
   };
 
+  const openDemoPage = () => {
+    setPageView("demo");
+    setActiveEmailForm("demo-confirm");
+    setEmailSubmitted(false);
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+  };
+
+  const openHomePage = () => {
+    setPageView("home");
+    setActiveEmailForm(null);
+    setEmailSubmitted(false);
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+  };
+
   const openEmailForm = (target: EmailFormTarget) => {
     setActiveEmailForm(target);
     setEmailSubmitted(false);
@@ -192,7 +223,19 @@ export default function App() {
       <StatusBar style="dark" />
       <ScrollView ref={scrollViewRef} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={styles.shell}>
-          <Header isWide={isWide} onNavPress={handleNavPress} />
+          <Header isWide={isWide && pageView === "home"} onBrandPress={openHomePage} onNavPress={handleNavPress} />
+
+          {pageView === "demo" ? (
+            <DemoPage
+              isDesktop={isDesktop}
+              email={email}
+              submitted={emailSubmitted}
+              onBack={openHomePage}
+              onChangeEmail={setEmail}
+              onSubmit={handleEmailSubmit}
+            />
+          ) : (
+            <>
 
           <View style={[styles.hero, isDesktop && styles.heroDesktop]}>
             <View style={[styles.heroCopy, isDesktop && styles.heroCopyDesktop]}>
@@ -205,22 +248,13 @@ export default function App() {
                 fitness experiences without making the app feel complicated.
               </Text>
               <View style={styles.heroActions}>
-                <TouchableOpacity activeOpacity={0.86} style={styles.primaryButton} onPress={() => openEmailForm("demo")}>
+                <TouchableOpacity activeOpacity={0.86} style={styles.primaryButton} onPress={openDemoPage}>
                   <Text style={styles.primaryButtonText}>Book a demo</Text>
                 </TouchableOpacity>
                 <TouchableOpacity activeOpacity={0.86} style={styles.secondaryButton}>
                   <Text style={styles.secondaryButtonText}>See the flow</Text>
                 </TouchableOpacity>
               </View>
-              {activeEmailForm === "demo" ? (
-                <EmailCapture
-                  email={email}
-                  submitted={emailSubmitted}
-                  submitLabel="Send demo request"
-                  onChangeEmail={setEmail}
-                  onSubmit={handleEmailSubmit}
-                />
-              ) : null}
             </View>
 
             <HeroProductVisual isDesktop={isDesktop} />
@@ -298,21 +332,31 @@ export default function App() {
               />
             ) : null}
           </View>
+            </>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function Header({ isWide, onNavPress }: { isWide: boolean; onNavPress: (item: NavItem) => void }) {
+function Header({
+  isWide,
+  onBrandPress,
+  onNavPress,
+}: {
+  isWide: boolean;
+  onBrandPress: () => void;
+  onNavPress: (item: NavItem) => void;
+}) {
   return (
     <View style={styles.header}>
-      <View style={styles.brand}>
+      <TouchableOpacity activeOpacity={0.78} style={styles.brand} onPress={onBrandPress}>
         <View style={styles.brandMark}>
           <Text style={styles.brandMarkText}>K</Text>
         </View>
         <Text style={styles.brandText}>KineticApp</Text>
-      </View>
+      </TouchableOpacity>
       {isWide ? (
         <View style={styles.nav}>
           {navItems.map((item) => (
@@ -322,6 +366,80 @@ function Header({ isWide, onNavPress }: { isWide: boolean; onNavPress: (item: Na
           ))}
         </View>
       ) : null}
+    </View>
+  );
+}
+
+function DemoPage({
+  isDesktop,
+  email,
+  submitted,
+  onBack,
+  onChangeEmail,
+  onSubmit,
+}: {
+  isDesktop: boolean;
+  email: string;
+  submitted: boolean;
+  onBack: () => void;
+  onChangeEmail: (value: string) => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <View style={styles.demoPage}>
+      <View style={[styles.demoHero, isDesktop && styles.demoHeroDesktop]}>
+        <View style={styles.demoCopy}>
+          <TouchableOpacity activeOpacity={0.78} style={styles.backButton} onPress={onBack}>
+            <Text style={styles.backButtonText}>Back to home</Text>
+          </TouchableOpacity>
+          <Text style={styles.kicker}>Demo booked</Text>
+          <Text style={[styles.demoTitle, isDesktop && styles.demoTitleDesktop]}>Thanks for booking the demo.</Text>
+          <Text style={styles.demoBody}>
+            In the demo, you will see how KineticApp turns nutrition scans, activity signals, recovery context, and
+            coaching into a product experience users can understand quickly.
+          </Text>
+        </View>
+        <View style={styles.demoVisual}>
+          <PhoneFrame image={screens.coach} size={isDesktop ? "hero" : "large"} />
+          <View style={styles.demoMetricStrip}>
+            <View style={styles.demoMetric}>
+              <Text style={styles.demoMetricValue}>3 min</Text>
+              <Text style={styles.demoMetricLabel}>guided walkthrough</Text>
+            </View>
+            <View style={styles.demoMetric}>
+              <Text style={styles.demoMetricValue}>4</Text>
+              <Text style={styles.demoMetricLabel}>product flows</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.demoOutcomeGrid}>
+        {demoOutcomes.map((item) => (
+          <View key={item.title} style={styles.demoOutcomeCard}>
+            <Text style={styles.demoOutcomeTitle}>{item.title}</Text>
+            <Text style={styles.demoOutcomeBody}>{item.body}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={[styles.demoEmailSection, isDesktop && styles.demoEmailSectionDesktop]}>
+        <View style={styles.demoEmailCopy}>
+          <Text style={styles.kicker}>Finish setup</Text>
+          <Text style={styles.demoEmailTitle}>Where should we send your demo details?</Text>
+          <Text style={styles.demoEmailBody}>
+            Leave your email and we will send the demo access details, recommended next steps, and a short product
+            overview you can share with your team.
+          </Text>
+        </View>
+        <EmailCapture
+          email={email}
+          submitted={submitted}
+          submitLabel="Send demo details"
+          onChangeEmail={onChangeEmail}
+          onSubmit={onSubmit}
+        />
+      </View>
     </View>
   );
 }
@@ -644,6 +762,163 @@ const styles = StyleSheet.create({
     color: palette.ink,
     fontSize: 15,
     fontWeight: "900",
+    fontFamily: fonts.sans,
+  },
+  demoPage: {
+    gap: 28,
+    paddingBottom: 12,
+  },
+  demoHero: {
+    gap: 28,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: palette.white,
+    padding: 22,
+    overflow: "hidden",
+  },
+  demoHeroDesktop: {
+    minHeight: 620,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 38,
+  },
+  demoCopy: {
+    flex: 1,
+    gap: 18,
+  },
+  backButton: {
+    alignSelf: "flex-start",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: palette.canvas,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  backButtonText: {
+    color: palette.text,
+    fontSize: 13,
+    fontWeight: "900",
+    fontFamily: fonts.sans,
+  },
+  demoTitle: {
+    color: palette.ink,
+    fontSize: 44,
+    lineHeight: 49,
+    fontWeight: "900",
+    letterSpacing: 0,
+    maxWidth: 720,
+    fontFamily: fonts.sans,
+  },
+  demoTitleDesktop: {
+    fontSize: 64,
+    lineHeight: 68,
+  },
+  demoBody: {
+    color: palette.muted,
+    fontSize: 18,
+    lineHeight: 30,
+    maxWidth: 680,
+    fontFamily: fonts.sans,
+  },
+  demoVisual: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 8,
+    backgroundColor: palette.faint,
+    padding: 22,
+    gap: 18,
+  },
+  demoMetricStrip: {
+    width: "100%",
+    maxWidth: 420,
+    flexDirection: "row",
+    gap: 12,
+  },
+  demoMetric: {
+    flex: 1,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: palette.white,
+    padding: 14,
+    gap: 4,
+  },
+  demoMetricValue: {
+    color: palette.ink,
+    fontSize: 24,
+    fontWeight: "900",
+    fontFamily: fonts.sans,
+  },
+  demoMetricLabel: {
+    color: palette.muted,
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    fontFamily: fonts.sans,
+  },
+  demoOutcomeGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 14,
+  },
+  demoOutcomeCard: {
+    flexGrow: 1,
+    flexBasis: 260,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: palette.line,
+    backgroundColor: palette.white,
+    padding: 22,
+    gap: 10,
+  },
+  demoOutcomeTitle: {
+    color: palette.ink,
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: "900",
+    fontFamily: fonts.sans,
+  },
+  demoOutcomeBody: {
+    color: palette.muted,
+    fontSize: 15,
+    lineHeight: 24,
+    fontFamily: fonts.sans,
+  },
+  demoEmailSection: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#cbeedd",
+    backgroundColor: palette.greenSoft,
+    padding: 22,
+    gap: 20,
+  },
+  demoEmailSectionDesktop: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 34,
+  },
+  demoEmailCopy: {
+    flex: 1,
+    gap: 12,
+  },
+  demoEmailTitle: {
+    color: palette.ink,
+    fontSize: 34,
+    lineHeight: 40,
+    fontWeight: "900",
+    maxWidth: 620,
+    fontFamily: fonts.sans,
+  },
+  demoEmailBody: {
+    color: palette.muted,
+    fontSize: 16,
+    lineHeight: 26,
+    maxWidth: 620,
     fontFamily: fonts.sans,
   },
   emailCard: {
