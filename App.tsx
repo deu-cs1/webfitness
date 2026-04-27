@@ -129,12 +129,12 @@ const demoOutcomes = [
     body: "Walk through scanning a meal, checking the daily plan, reviewing progress, and receiving a coach recommendation.",
   },
   {
-    title: "Understand the premium path",
-    body: "Preview how calorie tracking, AI coaching, and plan upgrades can become clear reasons for users to subscribe.",
+    title: "Explore smarter coaching",
+    body: "See how meal context, training history, and recovery signals can turn into direct recommendations users can act on.",
   },
   {
-    title: "Map it to your product",
-    body: "Use the demo to spot where nutrition, recovery, training, and progress insights would fit into your own app.",
+    title: "Build your next step",
+    body: "Use the demo to see how nutrition, recovery, training, and progress insights can support each stage of your journey.",
   },
 ];
 
@@ -401,16 +401,6 @@ function DemoPage({
         </View>
         <View style={styles.demoVisual}>
           <PhoneFrame image={screens.coach} size={isDesktop ? "hero" : "large"} />
-          <View style={styles.demoMetricStrip}>
-            <View style={styles.demoMetric}>
-              <Text style={styles.demoMetricValue}>3 min</Text>
-              <Text style={styles.demoMetricLabel}>guided walkthrough</Text>
-            </View>
-            <View style={styles.demoMetric}>
-              <Text style={styles.demoMetricValue}>4</Text>
-              <Text style={styles.demoMetricLabel}>product flows</Text>
-            </View>
-          </View>
         </View>
       </View>
 
@@ -427,10 +417,6 @@ function DemoPage({
         <View style={styles.demoEmailCopy}>
           <Text style={styles.kicker}>Finish setup</Text>
           <Text style={styles.demoEmailTitle}>Where should we send your demo details?</Text>
-          <Text style={styles.demoEmailBody}>
-            Leave your email and we will send the demo access details, recommended next steps, and a short product
-            overview you can share with your team.
-          </Text>
         </View>
         <EmailCapture
           email={email}
@@ -831,35 +817,6 @@ const styles = StyleSheet.create({
     padding: 22,
     gap: 18,
   },
-  demoMetricStrip: {
-    width: "100%",
-    maxWidth: 420,
-    flexDirection: "row",
-    gap: 12,
-  },
-  demoMetric: {
-    flex: 1,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: palette.line,
-    backgroundColor: palette.white,
-    padding: 14,
-    gap: 4,
-  },
-  demoMetricValue: {
-    color: palette.ink,
-    fontSize: 24,
-    fontWeight: "900",
-    fontFamily: fonts.sans,
-  },
-  demoMetricLabel: {
-    color: palette.muted,
-    fontSize: 12,
-    lineHeight: 18,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    fontFamily: fonts.sans,
-  },
   demoOutcomeGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -911,13 +868,6 @@ const styles = StyleSheet.create({
     fontSize: 34,
     lineHeight: 40,
     fontWeight: "900",
-    maxWidth: 620,
-    fontFamily: fonts.sans,
-  },
-  demoEmailBody: {
-    color: palette.muted,
-    fontSize: 16,
-    lineHeight: 26,
     maxWidth: 620,
     fontFamily: fonts.sans,
   },
