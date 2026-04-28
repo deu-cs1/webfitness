@@ -61,8 +61,8 @@ type EmailFormTarget = "access" | "demo-confirm";
 type PageView = "home" | "demo";
 
 const signalCards = [
-  { label: "Calories", value: "620 kcal", tone: "green" as const },
-  { label: "Protein", value: "38g", tone: "blue" as const },
+  { label: "Calories", value: "687 kcal", tone: "green" as const },
+  { label: "Protein", value: "28.4g", tone: "blue" as const },
   { label: "Coach note", value: "Lighter dinner", tone: "peach" as const },
 ];
 
