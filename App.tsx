@@ -105,7 +105,6 @@ const featureRows = [
     title: "Create meal plans and weekly programs with your AI coach",
     body: "The coach can combine meals, workouts, rest, goals, conversations, and user requests into one simple recommendation users can act on. It can create training programs from what users ask for, explain why a workout should be lighter, when to eat more protein, or how to recover after a difficult week.",
     image: screens.coach,
-    secondaryImage: screens.programTop,
     reverse: true,
   },
   {
@@ -113,6 +112,7 @@ const featureRows = [
     title: "Create and manage training plans in one focused workspace.",
     body: "Studio gives trainers and power users a cleaner place to shape programs, adjust routines, and keep the coaching experience organized. It can hold weekly schedules, exercise notes, rest days, and plan updates without crowding the user's main dashboard.",
     image: screens.studioActivity,
+    secondaryImage: screens.programTop,
     reverse: false,
   },
 ];
